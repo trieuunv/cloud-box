@@ -11,13 +11,13 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.example.project.dto.Message
-import org.example.project.dto.Participant
+import org.example.project.dto.ParticipantDto
 import org.example.project.ui.chat.components.MessageInput
 import org.example.project.ui.chat.components.MessageItem
 import org.example.project.ui.chat.components.Sidebar
 import org.example.project.ui.register.RegisterViewModel
 
-class ChatScreen(val participant: Participant) : Screen {
+class ChatScreen(val participant: ParticipantDto) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow

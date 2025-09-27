@@ -62,7 +62,7 @@ fun MessageItem(currentUserUsername: String?, message: Message, onDownload: (Mes
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             AsyncImage(
-                                model = "http://localhost:8080/${message.file.fileUrl}",
+                                model = "http://localhost:8080/${message.file?.fileUrl}",
                                 contentDescription = null,
                                 modifier = Modifier.fillMaxWidth()
                                     .clip(RoundedCornerShape(12.dp))

@@ -1,0 +1,16 @@
+Dependencies
+
+Spring Dev Tools
+
+Spring Web
+
+Thymeleaf 
+
+MySql
+Jpa
+
+Validation
+
+JavaMail
+
+Spring Sercuriry

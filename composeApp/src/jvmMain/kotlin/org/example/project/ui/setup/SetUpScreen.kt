@@ -12,6 +12,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import org.example.project.ui.mailregister.MailRegisterScreen
 import org.example.project.ui.register.RegisterScreen
 import org.example.project.ui.register.RegisterViewModel
 

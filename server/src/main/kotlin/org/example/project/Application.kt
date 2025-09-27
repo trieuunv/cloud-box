@@ -19,7 +19,8 @@ fun main() {
         }
 
         launch(Dispatchers.IO) {
-            ChatController.startServer()
+            ChatController.start()
+            // MailController.start()
         }
     }
 }

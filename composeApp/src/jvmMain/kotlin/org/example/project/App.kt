@@ -9,6 +9,7 @@ import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
+import org.example.project.ui.mailregister.MailRegisterScreen
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.example.project.ui.register.RegisterScreen
 import org.example.project.ui.setup.SetUpScreen

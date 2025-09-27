@@ -11,11 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import org.example.project.dto.Participant
+import org.example.project.dto.ParticipantDto
 import androidx.compose.material3.CardDefaults
 
 @Composable
-fun ParticipantItem(participant: Participant) {
+fun ParticipantItem(participant: ParticipantDto) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

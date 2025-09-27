@@ -16,10 +16,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.example.project.dto.Participant
+import org.example.project.dto.ParticipantDto
 
 @Composable
-fun Sidebar(participants: List<Participant>) {
+fun Sidebar(participants: List<ParticipantDto>) {
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
 
     Column(

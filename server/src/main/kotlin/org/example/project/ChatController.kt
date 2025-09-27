@@ -3,23 +3,25 @@ package org.example.project
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.serialization.builtins.ListSerializer
 import org.example.project.dto.*
+import org.example.project.utils.DateUtils
 import org.example.project.utils.FileUtils
 import java.io.File
 import java.util.*
 
 object ChatController {
-    val server = ServerSocketManager
+    val server = TCPServer
     val clientParticipants = Collections.synchronizedMap(mutableMapOf<ClientSocket, ParticipantDto>())
     val messages = Collections.synchronizedList(mutableListOf<Message>())
 
-    fun startServer() {
+    fun start() {
         server.start();
 
         server.onConnection { client ->
             CoroutineScope(Dispatchers.IO).launch {
                 server.join("chat_room", client)
+                val clientAddr = client.socket.remoteAddress.toString()
+                println("[${DateUtils.currentTime()}] Client connected: $clientAddr")
             }
         }
 
@@ -27,7 +29,7 @@ object ChatController {
             CoroutineScope(Dispatchers.IO).launch {
                 val participant = clientParticipants.remove(client)
                 if (participant != null) {
-                    server.broadcastToRoom("chat_room", "participant_left", participant, ParticipantDto.serializer())
+                    server.broadcastToRoom("chat_room", "participant_left", participant)
                     val message = Message(
                         id = UUID.randomUUID().toString(),
                         sender = "0",
@@ -37,19 +39,19 @@ object ChatController {
                         timestamp = System.currentTimeMillis()
                     )
 
-                    server.broadcastToRoom("chat_room", "message", message, Message.serializer())
+                    server.broadcastToRoom("chat_room", "message", message)
                 }
             }
         }
 
         server.subscribe<RegisterDto>("register") { client, data ->
             CoroutineScope(Dispatchers.IO).launch {
-                val participant = ParticipantDto(username = data.username)
+                val participant = ParticipantDto(UUID.randomUUID().toString(), data.username)
                 clientParticipants[client] = participant
 
-                server.sendToClient(client, "res_register", participant, ParticipantDto.serializer())
+                server.sendToClient(client, "res_register", participant)
 
-                server.broadcastToRoom("chat_room", "new_participant", participant, ParticipantDto.serializer())
+                server.broadcastToRoom("chat_room", "new_participant", participant)
 
                 val message = Message(
                     id = UUID.randomUUID().toString(),
@@ -60,15 +62,13 @@ object ChatController {
                     timestamp = System.currentTimeMillis()
                 )
 
-                server.broadcastToRoom("chat_room", "message", message, Message.serializer())
+                server.broadcastToRoom("chat_room", "message", message)
             }
         }
 
         server.subscribe("get_initial_participant") { client ->
-            println("get_initial_participant")
             CoroutineScope(Dispatchers.IO).launch {
-                println(clientParticipants.values.toList())
-                server.sendToClient(client, "initial_participant", clientParticipants.values.toList(), ListSerializer(ParticipantDto.serializer()))
+                server.sendToClient(client, "initial_participant", clientParticipants.values.toList())
             }
         }
 
@@ -76,15 +76,15 @@ object ChatController {
             var fileMessage: FileMessage? = null
 
             if (messsageSend.type == "file" || messsageSend.type == "image") {
-                if (messsageSend.file != null) {
-                    val safeFileName = "${UUID.randomUUID()}_${messsageSend.file.filename}"
+                messsageSend.file?.let { file ->
+                    val safeFileName = "${UUID.randomUUID()}_${file.filename}"
                     val outputPath = "uploads/$safeFileName"
-                    FileUtils.base64ToFile(messsageSend.file.filedata, outputPath)
+                    FileUtils.base64ToFile(file.filedata, outputPath)
                     fileMessage = FileMessage(
                         id = UUID.randomUUID().toString(),
-                        fileName = messsageSend.file.filename,
+                        fileName = file.filename,
                         fileUrl = outputPath,
-                        fileSize = messsageSend.file.filesize
+                        fileSize = file.filesize
                     )
                 }
             }
@@ -101,7 +101,7 @@ object ChatController {
             messages.add(newMessage)
 
             CoroutineScope(Dispatchers.IO).launch {
-                server.broadcastToRoom("chat_room", "message", newMessage, Message.serializer())
+                server.broadcastToRoom("chat_room", "message", newMessage)
             }
         }
 
@@ -115,7 +115,7 @@ object ChatController {
                         fileData = fileData,
                         fileSize = file.length()
                     )
-                    server.sendToClient(client, "res_download_file", fileResponse, FileResponse.serializer())
+                    server.sendToClient(client, "res_download_file", fileResponse)
                 } else {
                     // server.sendToClient(client, "res_download_file_error", "File not found")
                 }

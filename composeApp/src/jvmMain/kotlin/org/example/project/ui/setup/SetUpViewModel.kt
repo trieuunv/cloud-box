@@ -4,7 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import org.example.project.SocketManager
+import org.example.project.TCPClient
 
 class SetUpViewModel: ViewModel() {
     var host by mutableStateOf("localhost")
@@ -27,7 +27,7 @@ class SetUpViewModel: ViewModel() {
 
     fun connect() {
         if (host != "" && portInt in 1..65535) {
-            SocketManager.connect(host, portInt)
+            TCPClient.connect(host, portInt)
         }
     }
 }

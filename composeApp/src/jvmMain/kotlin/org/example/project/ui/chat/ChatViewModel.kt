@@ -4,7 +4,7 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import org.example.project.SocketManager
+import org.example.project.TCPClient
 import org.example.project.dto.*
 import org.example.project.utils.FileUtils
 import java.awt.FileDialog
@@ -12,14 +12,14 @@ import java.awt.Frame
 import java.io.File
 
 class ChatViewModel: ViewModel() {
-    val client = SocketManager
+    val client = TCPClient
 
-    var user by mutableStateOf<Participant?>(null)
+    var user by mutableStateOf<ParticipantDto?>(null)
         private set
 
     var pendingDownloadPath: String? = null
 
-    val participants = mutableStateListOf<Participant>()
+    val participants = mutableStateListOf<ParticipantDto>()
 
     val messages = mutableStateListOf<Message>()
 
@@ -30,9 +30,7 @@ class ChatViewModel: ViewModel() {
         private set
 
     init {
-        client.on<List<Participant>>("initial_participant") { initialParticipants ->
-            println("initial_participant")
-            println(initialParticipants)
+        client.on<List<ParticipantDto>>("initial_participant") { initialParticipants ->
             initialParticipants?.let {
                 MainScope().launch {
                     participants.clear()
@@ -49,7 +47,7 @@ class ChatViewModel: ViewModel() {
             }
         }
 
-        client.on<Participant>("new_participant") { participant ->
+        client.on<ParticipantDto>("new_participant") { participant ->
             if (participant != null) {
                 participants.add(participant)
             }
@@ -62,7 +60,7 @@ class ChatViewModel: ViewModel() {
             }
         }
 
-        client.on<Participant>("participant_left") { participant ->
+        client.on<ParticipantDto>("participant_left") { participant ->
             if (participant != null) {
                 participants.removeIf { it.id == participant.id }
             }
@@ -73,7 +71,7 @@ class ChatViewModel: ViewModel() {
         inputText = newText
     }
 
-    fun updateUser(newUser: Participant) {
+    fun updateUser(newUser: ParticipantDto) {
         user = newUser
     }
 
@@ -87,7 +85,7 @@ class ChatViewModel: ViewModel() {
     fun sendMessage() {
         user?.let { u ->
             if (inputText.isNotBlank()) {
-                val dto = MessageSend(
+                val dto = MessageSendDto(
                     sender = u.username,
                     content = inputText,
                     type = "text"
@@ -109,7 +107,7 @@ class ChatViewModel: ViewModel() {
                     filesize = file.length(),
                     filedata = encoded
                 )
-                val dto = MessageSend(
+                val dto = MessageSendDto(
                     sender = u.username,
                     content = null,
                     type = fileType,
